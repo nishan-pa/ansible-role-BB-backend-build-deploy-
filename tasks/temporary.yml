@@ -1,0 +1,108 @@
+---
+- name: Download IDE Jar from Download Server in Ansible Server
+  get_url:
+    url: "{{ download_server }}/bigbrain/docker/{{ ide_jar }}"
+    dest: "/tmp/{{ ide_jar }}"
+  delegate_to: 127.0.0.1
+  when: local == False  and build == False and aws == True and ide == True
+
+- name: Copying IDE Jar from Ansible Server to the Remote Server
+  copy:
+    src: "/tmp/{{ ide_jar }}"
+    dest: /ebs/bigbrain_jars
+    owner: "{{ bigbrain_user }}"
+  when: local == False and build == False and aws == True and ide == True
+
+- name: Download IDE Jar from Download Server in local env 
+  get_url:
+    url: "{{ download_server }}/bigbrain/docker/{{ ide_jar }}"
+    dest: "/ebs/bigbrain_jars"
+  become: True
+  become_user: "{{ bigbrain_user }}"
+  when: (local == True and ide == True) and build == False and aws == False
+
+- name: Download Engine Jar from Download Server in local env
+  get_url:
+    url: "{{ download_server }}/bigbrain/docker/{{ engine_jar }}"
+    dest: "/ebs/bigbrain_jars"
+  become: True
+  become_user: "{{ bigbrain_user }}"
+  when: (local == True and engine == True) and build == False
+
+- name: Pulling Code from Git Repository
+  git:
+    repo: "{{ git_repo }}"
+    dest: "{{ checkout_dir }}"
+    clone: yes
+    update: yes
+    force: yes
+    accept_hostkey: True
+    version: "{{ git_branch }}"
+    key_file: "{{ git_key_file }}"
+  delegate_to: 127.0.0.1
+  when: build
+
+- name: building with maven
+  shell: 
+     cmd: mvn clean install -U -P{{ maven_profile }} -Dmaven.test.skip=True
+     chdir: "{{ checkout_dir }}"
+  delegate_to: 127.0.0.1
+  when: build
+
+- name: Copy IDE builded Jar
+  copy:
+    src: "{{ checkout_dir }}/core/ide/target/{{ ide_jar }}"
+    dest: /ebs/bigbrain_jars
+    owner: "{{ bigbrain_user }}"
+  when: build == True and ide == True
+
+- name: Copy Engine builded Jar
+  copy:
+    src: "{{ checkout_dir }}/core/engine/target/{{ engine_jar }}"
+    dest: /ebs/bigbrain_jars
+    owner: "{{ bigbrain_user }}"
+  when: build == True and engine == True
+
+- name: Copy Engine-slave builded Jar
+  copy:
+    src: "{{ checkout_dir }}/core/engine-slave/target/{{ engine_slave_jar }}"
+    dest: /ebs/bigbrain_jars
+    owner: "{{ bigbrain_user }}"
+  when: build == True and engine_slave == True
+
+- name: Copying IDE Startup Script
+  template:
+    src: start-ide.sh.j2
+    dest: "/home/{{ bigbrain_user }}/start-ide.sh"
+    owner: "{{ bigbrain_user }}"
+  when: ide == True
+
+- name: Starting IDE Jar
+  shell: bash -x /home/{{ bigbrain_user }}/start-ide.sh
+  become: True
+  become_user: "{{ bigbrain_user }}"
+  async: 2592000
+  poll: 0
+  when: ide == True
+
+- name: Copying Engine Startup Script
+  template:
+    src: start-engine.sh.j2
+    dest: "/home/{{ bigbrain_user }}/start-engine.sh"
+    owner: "{{ bigbrain_user }}"
+  when: engine == True
+
+- name: Copying Engine cfg configuration
+  template:
+    src: cfg.json.j2
+    dest: "/home/{{ bigbrain_user }}/bigbrain/sdk/cfg.json"
+    owner: "{{ bigbrain_user }}"
+
+- name: Starting Engine Jar
+  shell: bash -x /home/{{ bigbrain_user }}/start-engine.sh
+  become: True
+  become_user: "{{ bigbrain_user }}"
+  async: 2592000
+  poll: 0
+  when: engine == True
+

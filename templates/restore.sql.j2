@@ -1,0 +1,17 @@
+use bigbrain_engine;
+update user set `ide_uuid` = "'{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}'" where user_id = 1;
+INSERT INTO role(id,name,code)VALUES(1,'Super Admin','SUPER_ADMIN'),(2,'Admin','ADMIN');
+INSERT INTO user_roles( FK_user_id,FK_role_id ) VALUES(1,1);
+INSERT INTO ide_user (id, created_on, ide_uuid, is_owner, frn_user_id) VALUES (1, current_date(), "'{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}'", 1, 1);
+INSERT INTO `infra_t_provisioned_software` (`id`, `created_on`, `is_active`, `name`, `status`, `created_by`, `software_artifact`)
+VALUES
+	(1, '2018-01-29 19:00:15', 1, 'spark-0', 'Running', 1, 1),
+	(2, '2018-01-29 19:06:11', 1, 'engine-slave-Local', 'Running', NULL, 9),
+	(3, '2018-01-29 19:18:10', 1, 'hadoop-0', 'Running', 1, 2);
+INSERT INTO `data_source_config` (`id`, `is_system_default`, `operational_params`, `type`, `user_defined_name`)
+VALUES
+	(2, NULL, '{\"HADOOP_DEFAULT_FS\": \"hdfs://127.0.0.1:9000\", \"HADOOP_PORT\": \"50070\",\"HADOOP_NAMENODE_IP\": \"127.0.0.1\",\"HADOOP_l_HOME\": \"/usr/local/hadoop/\",\"HDFS_USER_NAME\":\"bigbrain\"}', 'hdfs', 'Hadoop File System');
+#INSERT INTO `data_source_config` (`id`, `is_system_default`, `operational_params`, `type`, `user_defined_name`)
+#VALUES
+#	(1, NULL, '{}', 'local', 'Local File System');
+

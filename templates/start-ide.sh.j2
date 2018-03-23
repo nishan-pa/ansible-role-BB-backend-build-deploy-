@@ -1,0 +1,20 @@
+#!/bin/bash
+
+RESULT=`lsof -t -i:9999 |wc -l`
+
+echo ">> Starting IDE JAR <<"
+
+kill -9 `lsof -t -i:9999`
+nohup java -jar -Ddomain.address={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }} /ebs/bigbrain_jars/ide-1.0-SNAPSHOT.jar > /dev/null 2>&1 &
+
+
+   if [ $RESULT -eq 1 ]; then
+
+echo ">> IDE Jar is running... <<"
+
+else
+  echo ">> Jar is not started <<"
+   fi
+
+exit 0
+

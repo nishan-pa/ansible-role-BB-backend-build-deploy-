@@ -1,0 +1,5 @@
+---
+- include: create_dir.yml
+#- include: install_python_deps.yml
+- include: deploy_jar.yml
+#- include: append_mysql_table.yml

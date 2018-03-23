@@ -1,0 +1,25 @@
+---
+##The variables for BB Deployment 
+bigbrain_user: "bigbrain"
+local: True 
+build: True
+download_server: "http://downloads.razorthink.net"
+ide_jar: "ide-1.0-SNAPSHOT.jar"
+engine_jar: "engine.jar"
+engine_slave_jar: "engine-slave.jar"
+git_repo: "git@github.com:razorthinksoftware/bigbrain-v2.git"
+checkout_dir: "/home/nishan/Oldubuntu/home/nishan/workarea/git"
+git_branch: "bb-engine-master"
+git_key_file: "/root/.ssh.org/id_rsa"
+maven_profile: "staging"
+ide: True
+engine: False
+engine_slave: False
+aws: False
+build_with_ui: True
+ui_repo: "razorthinksoftware/bigbrain-ui-2.git"
+local_user: "nishan"
+checkout_ui_dir: "/home/nishan/Oldubuntu/home/nishan/workarea/git-ui"
+githubuser: "devopsrzt"
+githubpassword: "xNC8g0LA9MtAY"
+git_ui_branch: "deployment-branch"

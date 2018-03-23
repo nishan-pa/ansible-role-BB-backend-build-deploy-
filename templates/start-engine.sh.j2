@@ -1,0 +1,12 @@
+#!/bin/bash
+
+RESULT=`lsof -t -i:9090 |wc -l`
+
+echo ">> Starting Engine JAR <<"
+
+PID=`lsof -t -i:9090`
+kill -9 $PID
+nohup java -jar /ebs/bigbrain_jars/engine.jar > /dev/null 2>&1 &
+
+exit 0
+

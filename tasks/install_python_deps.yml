@@ -1,0 +1,54 @@
+---
+- name: Download bbciutils from Download Server
+  get_url:
+    url: '{{ download_server }}/bigbrain/py-libs/{{ item }}'
+    dest: '/tmp/{{ item }}'
+  with_items:
+  - bbcliutils-0.1-py2.py3-none-any.whl
+  - bigbrain_python_sdk-0.0.2-py3-none-any.whl
+  - cookbook_macros-0.1-py2.py3-none-any.whl
+  - model_factory-0.1-py3-none-any.whl
+  - rztdl-0.1.5-py3-none-any.whl
+  - rztfe-0.1-py2.py3-none-any.whl
+  delegate_to: 127.0.0.1
+  become: true
+  become_method: sudo
+  when: not local
+
+- name: Download bbciutils from Download Server in local env
+  get_url:
+    url: '{{ download_server }}/bigbrain/py-libs/{{item}}'
+    dest: '/tmp/{{item}}'
+  with_items:
+  - bbcliutils-0.1-py2.py3-none-any.whl
+  - bigbrain_python_sdk-0.0.2-py3-none-any.whl
+  - cookbook_macros-0.1-py2.py3-none-any.whl
+  - model_factory-0.1-py3-none-any.whl
+  - rztdl-0.1.5-py3-none-any.whl
+  - rztfe-0.1-py2.py3-none-any.whl
+  become: true
+  become_method: sudo
+  when: local
+
+- name: Copying Whl files to Destination Server
+  copy:
+    src: '/tmp/{{item}}'
+    dest: '/tmp/{{item}}'
+  with_items:
+  - bbcliutils-0.1-py2.py3-none-any.whl
+  - bigbrain_python_sdk-0.0.2-py3-none-any.whl
+  - cookbook_macros-0.1-py2.py3-none-any.whl
+  - model_factory-0.1-py3-none-any.whl
+  - rztdl-0.1.5-py3-none-any.whl
+  - rztfe-0.1-py2.py3-none-any.whl
+  when: not local
+
+- name: Installing all the Python Packages
+  shell: pip3 install /tmp/*.whl
+
+- name: Upgrade Tensorflow
+  pip:
+    name: tensorflow
+    extra_args: --upgrade
+    executable: pip3.5
+
